@@ -28,31 +28,3 @@ jobs:
           len=$(echo "$combos_json" | jq 'length')
           if [ "$len" -eq 0 ]; then
             echo "No active subscriptions — nothing to poll."
-            exit 0
-          fi
-          for i in $(seq 0 $((len-1))); do
-            ident=$(echo "$combos_json" | jq -r ".[$i].ident")
-            ik=$(echo "$combos_json" | jq -r ".[$i].instance_key // \"\"")
-            if [ -z "$ident" ] || [ "$ident" = "null" ]; then continue; fi
-            sleep $((RANDOM % 4 + 1))
-            echo "Polling $ident ..."
-            list=$(curl -fsSL -A "$UA" \
-              -H 'Origin: https://www.flightradar24.com' \
-              -H 'Referer: https://www.flightradar24.com/' \
-              "https://api.flightradar24.com/common/v1/flight/list.json?query=${ident}&fetchBy=flight&page=1&limit=10" || echo '{}')
-            click='{}'
-            fid=$(echo "$list" | jq -r '.result.response.data[0].identification.id // ""')
-            if [ -n "$fid" ] && [ "$fid" != "null" ]; then
-              click=$(curl -fsSL -A "$UA" \
-                -H 'Origin: https://www.flightradar24.com' \
-                -H 'Referer: https://www.flightradar24.com/' \
-                "https://data-live.flightradar24.com/clickhandler/?flight=${fid}&version=1.5" || echo '{}')
-            fi
-            body=$(jq -nc --arg id "$ident" --arg ik "$ik" --argjson list "$list" --argjson click "$click" \
-              '{ident:$id, instance_key:(if $ik=="" then null else $ik end), list:$list, click:$click}')
-            sig=$(printf '%s' "$body" | openssl dgst -sha256 -hmac "$INGEST_SECRET" -hex | awk '{print $2}')
-            curl -fsS -X POST "$NETLIFY_BASE/api/ingest-fr24" \
-              -H "Content-Type: application/json" \
-              -H "X-Ingest-Sig: $sig" \
-              --data "$body" || echo "ingest failed for $ident"
-          done
