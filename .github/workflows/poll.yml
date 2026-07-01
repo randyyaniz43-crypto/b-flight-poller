@@ -48,25 +48,41 @@ jobs:
 
           cat > /tmp/parse_fa.py <<'PYEOF'
           import sys, re, json, time
+          def out(obj):
+              print(json.dumps(obj)); sys.exit(0)
           try:
               html = open(sys.argv[1], encoding='utf-8', errors='ignore').read()
           except Exception:
               html = ''
           if not html:
-              print('{}'); sys.exit(0)
+              out({})
           m = re.search(r'var\s+trackpollBootstrap\s*=\s*(\{.*?\});\s*(?:var|</script>)', html, re.S)
           if not m:
-              print('{}'); sys.exit(0)
+              out({})
           try:
               bs = json.loads(m.group(1))
           except Exception:
-              print('{}'); sys.exit(0)
+              out({})
           legs = []
           for fid, f in (bs.get('flights') or {}).items():
               for l in ((f.get('activityLog') or {}).get('flights') or []):
                   legs.append(l)
           if not legs:
-              print('{}'); sys.exit(0)
+              out({})
+          res = {}
+          legs_out = []
+          for l in legs:
+              to = l.get('takeoffTimes') or {}
+              o = l.get('origin') or {}
+              d = l.get('destination') or {}
+              e = {'s': to.get('scheduled') or 0, 'a': 1 if to.get('actual') else 0,
+                   'o': o.get('iata'), 'd': d.get('iata'),
+                   'go': o.get('gate'), 'to': o.get('terminal'),
+                   'gd': d.get('gate'), 'td': d.get('terminal')}
+              if e['s'] and (e['go'] or e['gd'] or e['to'] or e['td']):
+                  legs_out.append(e)
+          if legs_out:
+              res['legs'] = legs_out[:16]
           now = time.time()
           best = None
           best_delta = 1e18
@@ -77,22 +93,21 @@ jobs:
               s = to.get('scheduled') or 0
               if not s:
                   continue
-              d = abs(s - now)
-              if d < best_delta:
-                  best_delta = d
+              dd = abs(s - now)
+              if dd < best_delta:
+                  best_delta = dd
                   best = l
           if not best:
               best = legs[0]
           o = best.get('origin') or {}
           d = best.get('destination') or {}
-          out = {}
-          if o.get('gate'): out['gate_origin'] = o['gate']
-          if d.get('gate'): out['gate_destination'] = d['gate']
-          if o.get('terminal'): out['terminal_origin'] = o['terminal']
-          if d.get('terminal'): out['terminal_destination'] = d['terminal']
-          if out:
-              out['source'] = 'flightaware-poller'
-          print(json.dumps(out))
+          if o.get('gate'): res['gate_origin'] = o['gate']
+          if d.get('gate'): res['gate_destination'] = d['gate']
+          if o.get('terminal'): res['terminal_origin'] = o['terminal']
+          if d.get('terminal'): res['terminal_destination'] = d['terminal']
+          if res:
+              res['source'] = 'flightaware-poller'
+          out(res)
           PYEOF
 
           combos_json=$(curl -fsSL --retry 3 --retry-delay 2 "$NETLIFY_BASE/api/active-idents" | jq -c '.combos // []')
