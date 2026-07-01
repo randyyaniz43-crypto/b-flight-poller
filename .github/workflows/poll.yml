@@ -47,7 +47,7 @@ jobs:
           }
 
           cat > /tmp/parse_fa.py <<'PYEOF'
-          import sys, re, json, time
+          import sys, re, json, time, math
           def out(obj):
               print(json.dumps(obj)); sys.exit(0)
           try:
@@ -64,10 +64,14 @@ jobs:
           except Exception:
               out({})
           legs = []
+          best_track = []
           for fid, f in (bs.get('flights') or {}).items():
               for l in ((f.get('activityLog') or {}).get('flights') or []):
                   legs.append(l)
-          if not legs:
+              tr = f.get('track') or []
+              if len(tr) > len(best_track):
+                  best_track = tr
+          if not legs and not best_track:
               out({})
           res = {}
           legs_out = []
@@ -83,6 +87,22 @@ jobs:
                   legs_out.append(e)
           if legs_out:
               res['legs'] = legs_out[:16]
+          coords = [p for p in best_track if p.get('coord')]
+          if coords:
+              last = coords[-1]
+              pos = {'lat': last['coord'][1], 'lon': last['coord'][0],
+                     'ts': last.get('timestamp') or 0}
+              withdata = [p for p in coords if p.get('alt') is not None and p.get('gs') is not None]
+              if withdata:
+                  pos['alt'] = withdata[-1].get('alt')
+                  pos['gs'] = withdata[-1].get('gs')
+              if len(coords) >= 2:
+                  p0 = coords[-2]['coord']
+                  p1 = last['coord']
+                  y = math.sin(math.radians(p1[0] - p0[0])) * math.cos(math.radians(p1[1]))
+                  x = math.cos(math.radians(p0[1])) * math.sin(math.radians(p1[1])) - math.sin(math.radians(p0[1])) * math.cos(math.radians(p1[1])) * math.cos(math.radians(p1[0] - p0[0]))
+                  pos['hd'] = int((math.degrees(math.atan2(y, x)) + 360) % 360)
+              res['pos'] = pos
           now = time.time()
           best = None
           best_delta = 1e18
@@ -97,14 +117,15 @@ jobs:
               if dd < best_delta:
                   best_delta = dd
                   best = l
-          if not best:
+          if not best and legs:
               best = legs[0]
-          o = best.get('origin') or {}
-          d = best.get('destination') or {}
-          if o.get('gate'): res['gate_origin'] = o['gate']
-          if d.get('gate'): res['gate_destination'] = d['gate']
-          if o.get('terminal'): res['terminal_origin'] = o['terminal']
-          if d.get('terminal'): res['terminal_destination'] = d['terminal']
+          if best:
+              o = best.get('origin') or {}
+              d = best.get('destination') or {}
+              if o.get('gate'): res['gate_origin'] = o['gate']
+              if d.get('gate'): res['gate_destination'] = d['gate']
+              if o.get('terminal'): res['terminal_origin'] = o['terminal']
+              if d.get('terminal'): res['terminal_destination'] = d['terminal']
           if res:
               res['source'] = 'flightaware-poller'
           out(res)
