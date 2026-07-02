@@ -73,19 +73,37 @@ jobs:
                   best_track = tr
           if not legs and not best_track:
               out({})
+          now = time.time()
+          def _t(d, k):
+              v = (d or {}).get(k)
+              return v if isinstance(v, (int, float)) and v else None
           res = {}
           legs_out = []
           for l in legs:
               to = l.get('takeoffTimes') or {}
+              ld = l.get('landingTimes') or {}
+              gdep = l.get('gateDepartureTimes') or {}
+              garr = l.get('gateArrivalTimes') or {}
               o = l.get('origin') or {}
               d = l.get('destination') or {}
               e = {'s': to.get('scheduled') or 0, 'a': 1 if to.get('actual') else 0,
                    'o': o.get('iata'), 'd': d.get('iata'),
                    'go': o.get('gate'), 'to': o.get('terminal'),
-                   'gd': d.get('gate'), 'td': d.get('terminal')}
-              if e['s'] and (e['go'] or e['gd'] or e['to'] or e['td']):
+                   'gd': d.get('gate'), 'td': d.get('terminal'),
+                   'ts_e': _t(to, 'estimated'), 'ts_a': _t(to, 'actual'),
+                   'ls_s': _t(ld, 'scheduled'), 'ls_e': _t(ld, 'estimated'), 'ls_a': _t(ld, 'actual'),
+                   'gd_s': _t(gdep, 'scheduled'), 'gd_e': _t(gdep, 'estimated'), 'gd_a': _t(gdep, 'actual'),
+                   'ga_s': _t(garr, 'scheduled'), 'ga_e': _t(garr, 'estimated'), 'ga_a': _t(garr, 'actual'),
+                   'st': l.get('flightStatus') or None,
+                   'cx': 1 if l.get('cancelled') else 0,
+                   'dv': 1 if l.get('diverted') else 0,
+                   'on': o.get('friendlyName'), 'dn': d.get('friendlyName'),
+                   'at': l.get('aircraftType')}
+              if e['s'] or e['gd_s']:
+                  e = {k: v for k, v in e.items() if (v not in (None, '', 0)) or k == 's'}
                   legs_out.append(e)
           if legs_out:
+              legs_out.sort(key=lambda e: abs((e.get('gd_s') or e.get('s') or 0) - now))
               res['legs'] = legs_out[:16]
           coords = [p for p in best_track if p.get('coord')]
           if coords:
@@ -103,7 +121,6 @@ jobs:
                   x = math.cos(math.radians(p0[1])) * math.sin(math.radians(p1[1])) - math.sin(math.radians(p0[1])) * math.cos(math.radians(p1[1])) * math.cos(math.radians(p1[0] - p0[0]))
                   pos['hd'] = int((math.degrees(math.atan2(y, x)) + 360) % 360)
               res['pos'] = pos
-          now = time.time()
           best = None
           best_delta = 1e18
           for l in legs:
@@ -139,17 +156,27 @@ jobs:
             exit 0
           fi
 
+          fr24_dead=0
           for i in $(seq 0 $((len-1))); do
             ident=$(echo "$combos_json" | jq -r ".[$i].ident")
             ik=$(echo "$combos_json" | jq -r ".[$i].instance_key // \"\"")
             if [ -z "$ident" ] || [ "$ident" = "null" ]; then continue; fi
-            sleep $((RANDOM % 4 + 1))
+            sleep 1
             echo "Polling $ident ..."
 
-            list=$(curl -fsSL -A "$UA_FR" \
-              -H 'Origin: https://www.flightradar24.com' \
-              -H 'Referer: https://www.flightradar24.com/' \
-              "https://api.flightradar24.com/common/v1/flight/list.json?query=${ident}&fetchBy=flight&page=1&limit=10" || echo '{}')
+            list='{}'
+            if [ "$fr24_dead" -eq 0 ]; then
+              list=$(curl -fsSL -A "$UA_FR" \
+                -H 'Origin: https://www.flightradar24.com' \
+                -H 'Referer: https://www.flightradar24.com/' \
+                "https://api.flightradar24.com/common/v1/flight/list.json?query=${ident}&fetchBy=flight&page=1&limit=10" || echo 'FAIL')
+              if [ "$list" = "FAIL" ]; then
+                echo "  FR24 bloqueado (403/429) — skip FR24 por el resto del run"
+                fr24_dead=1
+                list='{}'
+              fi
+            fi
+            echo "$list" | jq empty 2>/dev/null || list='{}'
             click='{}'
             fid=$(echo "$list" | jq -r '.result.response.data[0].identification.id // ""')
             if [ -n "$fid" ] && [ "$fid" != "null" ]; then
@@ -157,6 +184,7 @@ jobs:
                 -H 'Origin: https://www.flightradar24.com' \
                 -H 'Referer: https://www.flightradar24.com/' \
                 "https://data-live.flightradar24.com/clickhandler/?flight=${fid}&version=1.5" || echo '{}')
+              echo "$click" | jq empty 2>/dev/null || click='{}'
             fi
 
             icao_ident=$(iata_to_icao "$ident")
@@ -168,7 +196,7 @@ jobs:
               "https://flightaware.com/live/flight/${icao_ident}" || : > /tmp/fa.html
             fa_gate=$(python3 /tmp/parse_fa.py /tmp/fa.html) || fa_gate='{}'
             if [ -z "$fa_gate" ]; then fa_gate='{}'; fi
-            echo "  fa_gate: $fa_gate"
+            echo "  fa_gate: $(echo "$fa_gate" | head -c 400)"
 
             body=$(jq -nc --arg id "$ident" --arg ik "$ik" \
               --argjson list "$list" --argjson click "$click" --argjson fa_gate "$fa_gate" \
