@@ -14,7 +14,7 @@ permissions:
 jobs:
   poll:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - name: Poll FR24 + FlightAware and forward to Netlify
         env:
@@ -148,12 +148,15 @@ jobs:
           out(res)
           PYEOF
 
+          for cycle in 1 2; do
+          echo "=== ciclo $cycle ==="
           combos_json=$(curl -fsSL --retry 3 --retry-delay 2 "$NETLIFY_BASE/api/active-idents" | jq -c '.combos // []')
           echo "combos: $combos_json"
           len=$(echo "$combos_json" | jq 'length')
           if [ "$len" -eq 0 ]; then
-            echo "No active subscriptions — nothing to poll."
-            exit 0
+            echo "No active subscriptions this cycle."
+            if [ "$cycle" = "1" ]; then sleep 120; fi
+            continue
           fi
 
           fr24_dead=0
@@ -206,4 +209,6 @@ jobs:
               -H "Content-Type: application/json" \
               -H "X-Ingest-Sig: $sig" \
               --data "$body" || echo "ingest failed for $ident"
+          done
+          if [ "$cycle" = "1" ]; then sleep 120; fi
           done
