@@ -98,7 +98,9 @@ jobs:
                    'cx': 1 if l.get('cancelled') else 0,
                    'dv': 1 if l.get('diverted') else 0,
                    'on': o.get('friendlyName'), 'dn': d.get('friendlyName'),
-                   'at': l.get('aircraftType')}
+                   'at': l.get('aircraftType'),
+                   'oc': [round(o['coord'][1], 2), round(o['coord'][0], 2)] if isinstance(o.get('coord'), list) and len(o['coord']) == 2 else None,
+                   'dc': [round(d['coord'][1], 2), round(d['coord'][0], 2)] if isinstance(d.get('coord'), list) and len(d['coord']) == 2 else None}
               if e['s'] or e['gd_s']:
                   e = {k: v for k, v in e.items() if (v not in (None, '', 0)) or k == 's'}
                   legs_out.append(e)
