@@ -23,10 +23,13 @@
   espaciamiento_uniforme_pulgadas XOR zonas_espaciamiento[{espaciamiento_pulgadas,
   longitud_zona_pies?}] · acero_central_numero · elemento_estructural.
   answers[idx]: {L_colado, L_corte, L_fabrica, zona_conf}.
-- El análisis de foto (analyze-plan): en `main` desplegado sigue siendo un PROXY al sitio
-  viejo de ACP Piles (ornate-otter-fc386f.netlify.app). En el PR #1 (17/08) quedó REESCRITO:
-  llama DIRECTO a la API de Anthropic (`claude-opus-5`, structured output al esquema exacto
-  de la app, tramos incluidos, misma ANTHROPIC_API_KEY que ai.js) — pendiente de merge.
+- El análisis de foto (analyze-plan): RANDY MISMO lo pasó a Claude directo en `main`
+  (commits 3fc4fd4 + ecbf70b, 17/08): `claude-opus-5` con effort max, prompt propio que
+  también lee TABLAS MANUSCRITAS del contratista (filas Qty|Pile|Acero|Aros, "6#6" = 6
+  varillas #6, CB = acero central), parser con fences. ai.js también quedó en opus-5 +
+  effort max. El PR #1 (mergeado con main, sw v347) solo le SUMA: reglas de tramos en el
+  prompt (1er aro = posición, última zona = resto, nunca 1 sola zona) + normalizarTipo()
+  servidor. NO volver a reescribir analyze-plan: la base es la de Randy.
 
 ## Proyecto activo: 125 Guilford Ct., Tavernier FL 33070
 - Geotecnia: CVIII Engineering Group (Daniel Morao PE 87771), orden 26-0507-G, 07/05/2026.
