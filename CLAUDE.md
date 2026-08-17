@@ -15,7 +15,9 @@
   el deploy sale sólo de su máquina local. (2) Todo cambio va en rama nueva + Pull Request
   a `main`, nunca commit directo. (3) El cambio de tramos de aros YA ESTÁ HECHO en 94e2f9c
   (campo «Espaciamiento por TRAMOS» en Editar tipo, `parseTramos`/`tramosTexto`,
-  `zonas_espaciamiento` en el modelo) — no duplicarlo.
+  `zonas_espaciamiento` en el modelo) — no duplicarlo. Revisión 17/08: dos fallas
+  (1 tramo con longitud → 0 aros; 3er tramo ignorado en el conteo) corregidas en el
+  PR #1 de acp-foundation (rama claude/tramos-fixes) — pendiente de merge de Randy.
 - Datos del modelo por tipo: cantidad · longitud_colado_pies (pica) · diametro_pulgadas ·
   varilla_longitudinal_numero · varillas_por_pilote · aro_numero ·
   espaciamiento_uniforme_pulgadas XOR zonas_espaciamiento[{espaciamiento_pulgadas,
