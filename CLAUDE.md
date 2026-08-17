@@ -7,17 +7,22 @@
   `push_files`, `search_code`). El `git clone` por Bash puede quedar bloqueado por el
   clasificador de permisos — usar las herramientas MCP en su lugar.
 
-## La app «ACP Pilotes / ACP Foundation» — PENDIENTE DE UBICAR
-- Es la PWA donde Randy carga cada tipo de pilote. Formulario de 7 campos:
-  Cantidad de pilotes · Pica (profundidad del colado) · Diámetro · Varilla longitudinal ·
-  Cantidad por pilote · Aro/cerco · Espaciamiento de aros.
-- **NO está en GitHub**: verificado en los 2 repos de la cuenta (código y nombres), y tampoco
-  es un artifact publicado. El README de ob-intelligence la cita sólo como patrón
-  («PWA pura — mismo patrón que ACP Pilotes» → Netlify, JSON estáticos, localStorage).
-  Hipótesis: fuente en la máquina de Randy, deploy por drag-drop a Netlify.
-- **Cambio solicitado por Randy (16/08/2026), pendiente de ejecutar cuando aparezca la fuente**:
-  el campo «Espaciamiento de aros» debe pasar de valor único a **lista de tramos**
-  (cada tramo: longitud + separación), retrocompatible con registros de un solo valor.
+## La app «ACP Pilotes / ACP Foundation» — UBICADA (17/08/2026)
+- Repo privado `randyyaniz43-crypto/acp-foundation`, rama `main` — espejo exacto de lo
+  desplegado (BUILD 257, commit 94e2f9c). Módulo de pilotes: `piles/index.html` (una sola
+  página, ~3.4k líneas). Funciones serverless en `netlify/functions/` (12).
+- **REGLAS DE RANDY, no negociables**: (1) NUNCA desplegar a Netlify ni tocar el build —
+  el deploy sale sólo de su máquina local. (2) Todo cambio va en rama nueva + Pull Request
+  a `main`, nunca commit directo. (3) El cambio de tramos de aros YA ESTÁ HECHO en 94e2f9c
+  (campo «Espaciamiento por TRAMOS» en Editar tipo, `parseTramos`/`tramosTexto`,
+  `zonas_espaciamiento` en el modelo) — no duplicarlo.
+- Datos del modelo por tipo: cantidad · longitud_colado_pies (pica) · diametro_pulgadas ·
+  varilla_longitudinal_numero · varillas_por_pilote · aro_numero ·
+  espaciamiento_uniforme_pulgadas XOR zonas_espaciamiento[{espaciamiento_pulgadas,
+  longitud_zona_pies?}] · acero_central_numero · elemento_estructural.
+  answers[idx]: {L_colado, L_corte, L_fabrica, zona_conf}.
+- El análisis de foto (analyze-plan) es un PROXY al sitio viejo de ACP Piles
+  (ornate-otter-fc386f.netlify.app) — el prompt/schema de extracción vive ALLÁ, no en el repo.
 
 ## Proyecto activo: 125 Guilford Ct., Tavernier FL 33070
 - Geotecnia: CVIII Engineering Group (Daniel Morao PE 87771), orden 26-0507-G, 07/05/2026.
