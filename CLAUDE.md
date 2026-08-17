@@ -23,8 +23,10 @@
   espaciamiento_uniforme_pulgadas XOR zonas_espaciamiento[{espaciamiento_pulgadas,
   longitud_zona_pies?}] · acero_central_numero · elemento_estructural.
   answers[idx]: {L_colado, L_corte, L_fabrica, zona_conf}.
-- El análisis de foto (analyze-plan) es un PROXY al sitio viejo de ACP Piles
-  (ornate-otter-fc386f.netlify.app) — el prompt/schema de extracción vive ALLÁ, no en el repo.
+- El análisis de foto (analyze-plan): en `main` desplegado sigue siendo un PROXY al sitio
+  viejo de ACP Piles (ornate-otter-fc386f.netlify.app). En el PR #1 (17/08) quedó REESCRITO:
+  llama DIRECTO a la API de Anthropic (`claude-opus-5`, structured output al esquema exacto
+  de la app, tramos incluidos, misma ANTHROPIC_API_KEY que ai.js) — pendiente de merge.
 
 ## Proyecto activo: 125 Guilford Ct., Tavernier FL 33070
 - Geotecnia: CVIII Engineering Group (Daniel Morao PE 87771), orden 26-0507-G, 07/05/2026.
@@ -51,4 +53,14 @@
 2. Secciones que documentan la cota de la cabeza (detalle + wall section + cuadros GB/cabezales)
    con la cadena de cotas resultante.
 3. Tabla/curvas de capacidad calculadas con el Excel de Randy (Meyerhof + Método A).
-4. Preguntas de confirmación y llenado de la app ACP Foundation.
+4. **Hacerle a Randy LAS MISMAS PREGUNTAS del módulo Piles** (su Flow.build real, en orden),
+   para que él dé LA ÚLTIMA PALABRA — nunca inventar preguntas propias ni saltarse esto:
+   ① «¿Longitud total del COLADO del pilote?» (pies; profundidad real colada en sitio)
+   ② «¿A cuántos pies se PICA la varilla longitudinal?» (L_corte; cabeza = L_corte − L_colado)
+   ③ «¿Longitud de la varilla de FÁBRICA?» (20/30/40/60)
+   ④ «¿Cuántos pies tiene la zona de espaciamiento más cerrado?» — SOLO si hay tramos y la
+      zona 1 no declara largo (con largo declarado el módulo la salta)
+   ⑤ «¿Qué información necesitas?» (Solo resúmenes / Todo completo).
+   Toda pregunta admite «Otro (manual)» — ofrecer el valor ya decidido por Randy como opción.
+5. Con la última palabra dada: cargar la obra en el módulo Piles (confirmedTypes + answers)
+   y DESPUÉS llevar el trabajo a Pile Log. Nunca cargar sin la última palabra de Randy.
