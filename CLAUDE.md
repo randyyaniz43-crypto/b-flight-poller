@@ -16,8 +16,9 @@
   a `main`, nunca commit directo. (3) El cambio de tramos de aros YA ESTÁ HECHO en 94e2f9c
   (campo «Espaciamiento por TRAMOS» en Editar tipo, `parseTramos`/`tramosTexto`,
   `zonas_espaciamiento` en el modelo) — no duplicarlo. Revisión 17/08: dos fallas
-  (1 tramo con longitud → 0 aros; 3er tramo ignorado en el conteo) corregidas en el
-  PR #1 de acp-foundation (rama claude/tramos-fixes) — pendiente de merge de Randy.
+  (1 tramo con longitud → 0 aros; 3er tramo ignorado en el conteo) corregidas y
+  MERGEADAS a main (squash 7ca37e0, PR #1 cerrado). OJO: main va ADELANTE de lo
+  desplegado hasta que Randy despliegue desde su máquina (sw v347 esperando).
 - Datos del modelo por tipo: cantidad · longitud_colado_pies (pica) · diametro_pulgadas ·
   varilla_longitudinal_numero · varillas_por_pilote · aro_numero ·
   espaciamiento_uniforme_pulgadas XOR zonas_espaciamiento[{espaciamiento_pulgadas,
@@ -27,9 +28,9 @@
   (commits 3fc4fd4 + ecbf70b, 17/08): `claude-opus-5` con effort max, prompt propio que
   también lee TABLAS MANUSCRITAS del contratista (filas Qty|Pile|Acero|Aros, "6#6" = 6
   varillas #6, CB = acero central), parser con fences. ai.js también quedó en opus-5 +
-  effort max. El PR #1 (mergeado con main, sw v347) solo le SUMA: reglas de tramos en el
-  prompt (1er aro = posición, última zona = resto, nunca 1 sola zona) + normalizarTipo()
-  servidor. NO volver a reescribir analyze-plan: la base es la de Randy.
+  effort max. En main están también (mismo squash 7ca37e0): reglas de tramos en el prompt
+  (1er aro = posición, última zona = resto, nunca 1 sola zona) + normalizarTipo() servidor.
+  NO volver a reescribir analyze-plan: la base es la de Randy.
 
 ## Proyecto activo: 125 Guilford Ct., Tavernier FL 33070
 - Geotecnia: CVIII Engineering Group (Daniel Morao PE 87771), orden 26-0507-G, 07/05/2026.
