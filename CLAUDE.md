@@ -47,6 +47,14 @@
   Profundidad bajo terreno NO DETERMINABLE sin topografía (terreno ≈ tope cabezal + 4½").
 - Pendientes del expediente: nadie exige prueba de carga (pedir D1143 + D3689); separación
   48" = 3D exacto sin margen; S-8 cita "CIVIL ENGINEERING GROUP" y es CVIII.
+- **CARGADO EN LA APP (17/08/2026, con la última palabra de Randy)**: preguntas del módulo
+  respondidas → L_colado 27 · L_corte 30 · L_fabrica 40 · resúmenes. Obra creada en Piles
+  (job 42×ACIP Ø16" · 7 #5 · aros #3 en 2 zonas 12'@8"+resto@12" → 31 aros/pilote) y
+  proyecto creado en Pile Log (id f3c67b9f-258e-4b1f-86d9-63431313f12d, jaula importada,
+  sin planos ni cliente — Randy los completa en la app). Escritura vía POST /api/sync
+  (doc completo: piles `{updatedAt,jobs}` SIN envoltura; log `{updatedAt,data:{projects,symbols}}`),
+  header x-acp-write = contraseña de edición que Randy pasa cuando hace falta — NO guardarla
+  en esta memoria. Siempre: GET → respaldo → agregar → POST completo → GET de verificación.
 
 ## Orden de trabajo acordado (repetir en cada set nuevo)
 1. Plano de fundación con los pilotes señalados y clasificados por tipo.
