@@ -53,8 +53,11 @@
 - **CARGADO EN LA APP (17/08/2026, con la última palabra de Randy)**: preguntas del módulo
   respondidas → L_colado 27 · L_corte 30 · L_fabrica 40 · resúmenes. Obra creada en Piles
   (job 42×ACIP Ø16" · 7 #5 · aros #3 en 2 zonas 12'@8"+resto@12" → 31 aros/pilote) y
-  proyecto creado en Pile Log (id f3c67b9f-258e-4b1f-86d9-63431313f12d, jaula importada,
-  sin planos ni cliente — Randy los completa en la app). Escritura vía POST /api/sync
+  proyecto creado en Pile Log (id f3c67b9f-258e-4b1f-86d9-63431313f12d) COMPLETO: jaula,
+  plano S-1 subido (blob pilelog-i-4dd83649-6079-4bb6-9aa5-1577c31ebc08, 3001×1473 recorte
+  755,655–2365,1445 del PDF estructural a escala 3000/1610) y los 42 pilotes CONFIRMADOS
+  con coordenadas de la detección geométrica, colores de la app (#5CB8FF 1P · #FF8A33 2PC ·
+  #2EE6A1 3PC) y colorLabels. Falta solo el cliente (Randy en la app). Escritura vía POST /api/sync
   (doc completo: piles `{updatedAt,jobs}` SIN envoltura; log `{updatedAt,data:{projects,symbols}}`),
   header x-acp-write = contraseña de edición que Randy pasa cuando hace falta — NO guardarla
   en esta memoria. Siempre: GET → respaldo → agregar → POST completo → GET de verificación.
