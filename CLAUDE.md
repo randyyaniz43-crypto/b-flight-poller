@@ -57,11 +57,18 @@
   proyecto creado en Pile Log (id f3c67b9f-258e-4b1f-86d9-63431313f12d) COMPLETO: jaula,
   plano S-1 subido (blob pilelog-i-4dd83649-6079-4bb6-9aa5-1577c31ebc08, 3001×1473 recorte
   755,655–2365,1445 del PDF estructural a escala 3000/1610) y los 42 pilotes CONFIRMADOS
-  con coordenadas de la detección geométrica, colores de la app (#5CB8FF 1P · #FF8A33 2PC ·
-  #2EE6A1 3PC) y colorLabels. Falta solo el cliente (Randy en la app). Escritura vía POST /api/sync
+  con coordenadas de la detección geométrica, TODOS en ROJO #FF4D4D capa «House» (regla de
+  Randy, 18/08; jaula también renombrada 'House'). El plano de la app va LIMPIO, sin leyenda
+  impresa (Randy la pidió y luego la quitó: la leyenda con profundidades quedó solo como
+  imagen entregada en el chat). Falta solo el cliente (Randy en la app). Escritura vía POST /api/sync
   (doc completo: piles `{updatedAt,jobs}` SIN envoltura; log `{updatedAt,data:{projects,symbols}}`),
   header x-acp-write = contraseña de edición que Randy pasa cuando hace falta — NO guardarla
   en esta memoria. Siempre: GET → respaldo → agregar → POST completo → GET de verificación.
+
+## Regla PERMANENTE de capas en Pile Log (Randy, 18/08/2026 — «esto siempre aplica»)
+- Pilotes de CASA → capa ROJA `#FF4D4D` con nombre **House**.
+- El AZUL `#5CB8FF` queda RESERVADO para la PISCINA → nombre **Pool** (solo si hay piscina).
+- Los nombres de capas (colorLabels) van SIEMPRE en inglés (House, Pool, Carport, Deck…).
 
 ## Orden de trabajo acordado (repetir en cada set nuevo)
 1. Plano de fundación con los pilotes señalados y clasificados por tipo.
