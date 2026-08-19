@@ -69,6 +69,9 @@
 - Pilotes de CASA → capa ROJA `#FF4D4D` con nombre **House**.
 - El AZUL `#5CB8FF` queda RESERVADO para la PISCINA → nombre **Pool** (solo si hay piscina).
 - Los nombres de capas (colorLabels) van SIEMPRE en inglés (House, Pool, Carport, Deck…).
+- OJO técnico: el color de capa se escribe en `manualColor` del pilote (el campo `color` solo
+  pinta los 'detected'; un 'confirmed' sin manualColor se dibuja VERDE de estado). Poner
+  `color` Y `manualColor` iguales + colorLabels con ese hex.
 
 ## Orden de trabajo acordado (repetir en cada set nuevo)
 1. Plano de fundación con los pilotes señalados y clasificados por tipo.
