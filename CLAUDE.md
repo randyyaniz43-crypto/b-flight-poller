@@ -17,8 +17,9 @@
   (campo «Espaciamiento por TRAMOS» en Editar tipo, `parseTramos`/`tramosTexto`,
   `zonas_espaciamiento` en el modelo) — no duplicarlo. Revisión 17/08: dos fallas
   (1 tramo con longitud → 0 aros; 3er tramo ignorado en el conteo) corregidas y
-  MERGEADAS a main (squash 7ca37e0, PR #1 cerrado). OJO: main va ADELANTE de lo
-  desplegado hasta que Randy despliegue desde su máquina (sw v347 esperando).
+  MERGEADAS a main (squash 7ca37e0, PR #1 cerrado). Randy YA DESPLEGÓ los arreglos
+  de tramos desde su máquina (BUILD 259, commit c89fdf2, ~20/08): main = desplegado
+  de nuevo.
 - Datos del modelo por tipo: cantidad · longitud_colado_pies (pica) · diametro_pulgadas ·
   varilla_longitudinal_numero · varillas_por_pilote · aro_numero ·
   espaciamiento_uniforme_pulgadas XOR zonas_espaciamiento[{espaciamiento_pulgadas,
@@ -72,6 +73,27 @@
 - OJO técnico: el color de capa se escribe en `manualColor` del pilote (el campo `color` solo
   pinta los 'detected'; un 'confirmed' sin manualColor se dibuja VERDE de estado). Poner
   `color` Y `manualColor` iguales + colorLabels con ese hex.
+
+## Fórmulas de RENDIMIENTO (Randy, 21/08/2026 — «ponéselas al agente de Piles»)
+Calibradas con regresión sobre el Pile Log real (41 días de hinca medidos en vivo · 21 obras ·
+789 pilotes, may–ago 2026; verificadas con recálculo independiente). Usarlas SIEMPRE que Randy
+pida pronosticar tiempo de obra, días o camiones. También están en el manual del agente de la
+app (`ai-knowledge.js`, sección RENDIMIENTO — PR #2 de acp-foundation).
+- **Minutos de hinca del día ≈ 55 + 5.7×pilotes + 0.41×pies** (error ±49 min). Jornada efectiva
+  ≈ 300 min (5 h) → pilotes/día n ≈ 245 ÷ (5.7 + 0.41×L), L = pies por pilote.
+- **Días de obra** = pilotes ÷ n (arriba). Atajo: horas ≈ pilotes × 17 ÷ 60 — el Nº de pilotes
+  pronostica mejor (r² 0.94) que pies (0.91) o concreto (0.91); pies y yd³ son casi la misma
+  señal (corr 0.977; 4.08 bombazos/ft · 63 bombazos = 1 yd³).
+- **Camiones por día** (en función de los días que dé la fórmula): yd³ del día ≈ pies del día
+  × 0.065 → camiones = yd³ ÷ 5.6, redondeado HACIA ARRIBA (5.6 = mediana real de yd³/camión en
+  sus truckMarkers; el camión del cierre del día va parcial — la capacidad nominal es 7.5).
+  Bolsillo: 1 camión por cada ~85-90 pies; típico 3-4 camiones/día.
+- **Jaulas**: min/jaula ≈ 0.96 × (aros + 2×varillas); jornada de 8 h. Pronosticar por
+  COMPLEJIDAD, nunca por toneladas (el peso infla ~2× las jaulas largas). Guilford: 43 min/jaula
+  → 42 jaulas ≈ 30 h ≈ 4 jornadas.
+- Guardas: días YA trabajados → mandan los datos reales del Log, no la fórmula. Esperas de
+  camión: irrelevantes (1.2% del tiempo). El «Drill Time» manual de Randy queda ~6 min por
+  debajo del ciclo real (no usarlo para pronosticar).
 
 ## Orden de trabajo acordado (repetir en cada set nuevo)
 1. Plano de fundación con los pilotes señalados y clasificados por tipo.
