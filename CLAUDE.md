@@ -62,6 +62,21 @@
   header x-acp-write = contraseña de edición que Randy pasa cuando hace falta — NO guardarla
   en esta memoria. Siempre: GET → respaldo → agregar → POST completo → GET de verificación.
 
+## Proyecto nuevo: 102 Milano Dr., Islamorada FL 33036 (25/08/2026)
+- Contrato/Scope of Work de ACP Foundation Works LLC. Owner: Mr. David Engel,
+  102 Milano Dr, Islamorada FL 33036 · (305) 304-4501 · homeinspectorinthekeys@gmail.com.
+  Project Name: «102 Milano add. auger Piles».
+- Alcance leido del escaneo (verificado a zoom): **21 pilotes auger cast Ø16"**,
+  **17 ft «or Refusal»** de longitud, **6 varillas #6**, **aros #3 @ 10" o.c. uniformes**
+  (sin zona de confinamiento declarada), **grout 5000 psi**.
+- El escaneo llega CORTADO por abajo: faltan las notas al pie *, ** y *** que califican
+  «17 ft», «as specified at the above mentioned location» y «or Refusal». Pedirlas.
+- NO hay estudio de suelos ni planos estructurales en mano → cota de corte, nivel del
+  concreto, recubrimiento, traslape, separadores y largo de jaula quedan NO DETERMINABLES.
+- Ficha-imagen entregada: `Ficha_Pilotes_102_MILANO_DR.png` (molde de 7 campos + complemento
+  + banda de alerta). Pendiente: la ULTIMA PALABRA de Randy en las preguntas del modulo
+  Piles (L_colado / L_corte / L_fabrica) antes de cargar la obra en la app.
+
 ## Orden de trabajo acordado (repetir en cada set nuevo)
 1. Plano de fundación con los pilotes señalados y clasificados por tipo.
 2. Secciones que documentan la cota de la cabeza (detalle + wall section + cuadros GB/cabezales)
