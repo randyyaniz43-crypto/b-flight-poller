@@ -53,6 +53,7 @@
 | acp-foundation | #4 | deduplicar 9,9 MB: una sola copia de `polish.*` e `images/` |
 | acp-foundation | #5 | service worker: tope de red, caché honesta, extintor |
 | acp-foundation | #6 | reporte de errores desde el teléfono de la cuadrilla |
+| acp-foundation | #7 | aviso cuando un tramo de aros queda en 0 pies + tests del motor |
 | b-flight-poller | #4 | esta corrección de memoria |
 
 - **Randy tiene que hacer dos cosas a mano** (no las puede hacer una sesión):
@@ -63,16 +64,27 @@
 - **`sw-kill.js` (PR #5) es la salida de emergencia**, y hay que saber que existe: un
   service worker mal desplegado deja clavados los teléfonos ya instalados y ningún deploy
   los rescata. Se copia sobre `sw.js`, se despliega, y cada teléfono se limpia solo.
-- Con los cuatro fusionados hay **85 tests** con `npm test` (`node --test`, cero
-  dependencias, sin bundler): 44 · 4 · 17 · 20. Los de service worker y los del cliente de
-  errores ejecutan el archivo REAL dentro de un entorno simulado con `node:vm`, así que no
+- Con los cinco fusionados hay **99 tests** con `npm test` (`node --test`, cero
+  dependencias, sin bundler): 44 · 4 · 17 · 20 · 14. Los de service worker y los del cliente
+  de errores ejecutan el archivo REAL dentro de un entorno simulado con `node:vm`, así que no
   pueden divergir de lo desplegado. **Correr `npm test` antes de tocar nada.**
+- Los cinco fusionan limpio en cualquier orden — comprobado fusionando las ramas de verdad
+  sobre `main`, no suponiéndolo. Ese chequeo es barato (`git merge` en local) y **hay que
+  hacerlo antes de afirmar que no hay conflicto**: en esta sesión se afirmó dos veces sin
+  comprobar y una de las dos era falsa.
 - Sigue abierto y NO es mío: **PR #2 de acp-foundation** (`claude/rendimiento-agente`,
   fórmulas de rendimiento del agente IA), del 21/08, sobre una base anterior al `main`
   actual — puede pedir un merge cuando Randy lo retome.
-- Lo único que quedó del plan de cinco pasos: extraer el cálculo de aros de
-  `piles/index.html` a un módulo con `node:test`. Los BUGS ya están arreglados (ver arriba);
-  lo que falta es sólo que su regresión deje de necesitar Chromium.
+- **El plan de cinco pasos está completo.** Y ojo con lo que decía esta misma nota antes:
+  que faltaba «extraer el cálculo de aros de `piles/index.html` a un módulo». ESO YA ESTABA
+  HECHO — el motor vive en `/acp-calc-pilotes.js` (482 líneas, JS puro, sin DOM ni idioma,
+  compartido por `/piles/` y `/gestion/`) y ya traía `module.exports`, así que se puede
+  `require()` desde Node sin navegador. Lo que faltaba de verdad eran los tests, y los
+  añade el PR #7.
+- Referencia del motor, verificada ejecutándolo: 125 Guilford Ct. da **31 aros por pilote y
+  1302 en la obra**. `L_efectiva = L_colado − punta`; la cabeza NO descuenta aros (en
+  `L_corte − punta − cabeza` el `L_corte` se cancela). Si algún día ese 31 cambia, algo se
+  rompió.
 
 ## Proyecto activo: 125 Guilford Ct., Tavernier FL 33070
 - Geotecnia: CVIII Engineering Group (Daniel Morao PE 87771), orden 26-0507-G, 07/05/2026.
