@@ -36,6 +36,44 @@
   prompt (1er aro = posición, última zona = resto, nunca 1 sola zona) + normalizarTipo()
   servidor. NO volver a reescribir analyze-plan: la base es la de Randy.
 
+## Pull Requests abiertos (foto del 29/08/2026 — VERIFICAR ANTES DE ACTUAR)
+- **Esta lista caduca.** La nota de tramos de arriba decía «pendiente de merge» de un PR
+  fusionado hacía doce días, y por poco se rehace trabajo ya en producción. Antes de tocar
+  nada de lo de abajo: `list_pull_requests` con state=all y mirar `merged_at`. Si aparece
+  fusionado, además confirmarlo en el código de `main` — la API dice qué pasó, el código
+  dice qué hay.
+- **Ninguno toca el build ni el despliegue.** Salen todos de `main`, son independientes y
+  se fusionan en cualquier orden. Los cuatro de acp-foundation añaden el mismo bloque
+  `scripts.test` a `package.json`, byte a byte idéntico, para que git los fusione sin
+  conflicto. Ojo: hay un **#4 en cada repo**, son cosas distintas.
+
+| Repo | PR | Qué |
+|---|---|---|
+| acp-foundation | #3 | scrypt + límite de intentos + respaldo diario de Blobs + PDF.js |
+| acp-foundation | #4 | deduplicar 9,9 MB: una sola copia de `polish.*` e `images/` |
+| acp-foundation | #5 | service worker: tope de red, caché honesta, extintor |
+| acp-foundation | #6 | reporte de errores desde el teléfono de la cuadrilla |
+| b-flight-poller | #4 | esta corrección de memoria |
+
+- **Randy tiene que hacer dos cosas a mano** (no las puede hacer una sesión):
+  (1) **rotar la contraseña de Pablito** — se sacó del fuente en el PR #3 pero sigue en el
+  historial de git, y quitarla del código NO la invalida; (2) poner **`ACP_PW_PEPPER`** en
+  las variables de Netlify — sin ella el PR #3 funciona igual, pero el índice de búsqueda
+  deja de proteger contra búsqueda offline si alguien se lleva el blob.
+- **`sw-kill.js` (PR #5) es la salida de emergencia**, y hay que saber que existe: un
+  service worker mal desplegado deja clavados los teléfonos ya instalados y ningún deploy
+  los rescata. Se copia sobre `sw.js`, se despliega, y cada teléfono se limpia solo.
+- Con los cuatro fusionados hay **85 tests** con `npm test` (`node --test`, cero
+  dependencias, sin bundler): 44 · 4 · 17 · 20. Los de service worker y los del cliente de
+  errores ejecutan el archivo REAL dentro de un entorno simulado con `node:vm`, así que no
+  pueden divergir de lo desplegado. **Correr `npm test` antes de tocar nada.**
+- Sigue abierto y NO es mío: **PR #2 de acp-foundation** (`claude/rendimiento-agente`,
+  fórmulas de rendimiento del agente IA), del 21/08, sobre una base anterior al `main`
+  actual — puede pedir un merge cuando Randy lo retome.
+- Lo único que quedó del plan de cinco pasos: extraer el cálculo de aros de
+  `piles/index.html` a un módulo con `node:test`. Los BUGS ya están arreglados (ver arriba);
+  lo que falta es sólo que su regresión deje de necesitar Chromium.
+
 ## Proyecto activo: 125 Guilford Ct., Tavernier FL 33070
 - Geotecnia: CVIII Engineering Group (Daniel Morao PE 87771), orden 26-0507-G, 07/05/2026.
   Estructura: LINCHENATENG / David G. Osborn AIA, job 2024071, set FOR SUBMITTAL 09/07/2026.
