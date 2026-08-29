@@ -17,7 +17,12 @@
   (campo «Espaciamiento por TRAMOS» en Editar tipo, `parseTramos`/`tramosTexto`,
   `zonas_espaciamiento` en el modelo) — no duplicarlo. Revisión 17/08: dos fallas
   (1 tramo con longitud → 0 aros; 3er tramo ignorado en el conteo) corregidas en el
-  PR #1 de acp-foundation (rama claude/tramos-fixes) — pendiente de merge de Randy.
+  PR #1 de acp-foundation (rama claude/tramos-fixes), **FUSIONADO el 17/08/2026**.
+  Verificado en `main` (29/08): están `parseTramos`/`tramosProblema`, el aviso
+  «Un solo tramo con longitud no define el resto del fuste» y el `normalizarTipo()`
+  del servidor en `analyze-plan.js`. Los dos bugs de aros YA NO EXISTEN: no rehacerlos.
+  Ojo: su regresión de tramos (20 casos) corre en Chromium headless contra la página
+  real, no con `npm test` — sigue sin extraerse a un módulo.
 - Datos del modelo por tipo: cantidad · longitud_colado_pies (pica) · diametro_pulgadas ·
   varilla_longitudinal_numero · varillas_por_pilote · aro_numero ·
   espaciamiento_uniforme_pulgadas XOR zonas_espaciamiento[{espaciamiento_pulgadas,
