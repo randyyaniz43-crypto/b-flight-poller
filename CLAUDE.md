@@ -197,8 +197,49 @@ app (`ai-knowledge.js`, sección RENDIMIENTO — PR #2 de acp-foundation).
 - NO hay estudio de suelos ni planos estructurales en mano → cota de corte, nivel del
   concreto, recubrimiento, traslape, separadores y largo de jaula quedan NO DETERMINABLES.
 - Ficha-imagen entregada: `Ficha_Pilotes_102_MILANO_DR.png` (molde de 7 campos + complemento
-  + banda de alerta). Pendiente: la ULTIMA PALABRA de Randy en las preguntas del modulo
-  Piles (L_colado / L_corte / L_fabrica) antes de cargar la obra en la app.
+  + banda de alerta).
+
+### PENDIENTES de Milano Dr. — dónde está frenada, contra el orden de trabajo de abajo
+Comparar con Guilford, que está COMPLETO, deja ver lo que falta: allá había geotecnia (CVIII)
+y estructural (LINCHENATENG). Acá **sólo hay un Scope of Work**, y de eso cuelga todo.
+
+| Paso | Estado | Qué lo traba |
+|---|---|---|
+| ① Plano de fundación con los pilotes clasificados | **BLOQUEADO** | no hay planos estructurales |
+| ② Cota de la cabeza (cadena de cotas) | **BLOQUEADO** | sin planos ni topografía: NO DETERMINABLE |
+| ③ Capacidad con el Excel (Meyerhof + Método A) | **BLOQUEADO** | sin estudio de suelos no hay N-SPT que meterle |
+| ④ Las preguntas del módulo Piles | **ESPERA A RANDY** | ver abajo; es lo único que NO depende de terceros |
+| ⑤ Cargar en Piles y después Pile Log | **BLOQUEADO por ④** | la regla es no cargar sin su última palabra |
+
+**Hay que PEDIR (no lo tenemos, y sin esto los pasos ① a ③ no arrancan):**
+1. **Las notas al pie del Scope of Work.** El escaneo llega cortado por abajo y faltan la *, la
+   ** y la ***, que son justamente las que califican «17 ft», «as specified at the above
+   mentioned location» y «or Refusal». Sin ellas no sabemos qué manda la longitud.
+2. **El estudio de suelos** (boring log / SPT). Sin él no hay capacidad, ni profundidad de punta
+   justificada, ni forma de contrastar el «or Refusal».
+3. **Los planos estructurales** (fundación + secciones + cuadro de cabezales).
+
+**Cuando Randy esté disponible, preguntarle SOLO esto** (es el Flow.build real; ya está
+verificado cuál no aplica):
+- ① «¿Longitud total del COLADO del pilote?» — **no la sabemos.** El contrato dice 17 ft *or
+  Refusal*, o sea que la profundidad real la define el rechazo en obra, no el papel.
+- ② «¿A cuántos pies se PICA la varilla longitudinal?» — no la sabemos.
+- ③ «¿Longitud de la varilla de FÁBRICA?» (20/30/40/60) — no la sabemos.
+- ④ **NO APLICA.** El módulo la salta: los aros son **@ 10" o.c. UNIFORMES**, sin tramos ni zona
+  de confinamiento declarada, así que no hay «zona más cerrada» que preguntar.
+- ⑤ «¿Qué información necesitas?» (Solo resúmenes / Todo completo).
+
+**TRAMPA, no repetirla:** NO copiar los números de Guilford. Allá la pica es 27 ft porque el
+barreno es de 30 y quedan 3 ft sin colar arriba — eso es de ESA obra. Acá no hay barreno
+declarado ni nada que diga que sobra lo mismo. Ni siquiera se puede adelantar el conteo de aros:
+el motor necesita `L_colado`, y sin ese dato el número de aros de Milano NO es calculable.
+Cuánto importa, corriendo el motor de verdad con los datos del contrato (Ø16", 6 #6, aros #3
+@ 10" uniformes, 21 pilotes): con `L_colado` 17 ft dan **17 aros/pilote y 357 en la obra**; con
+20 ft, 441; con 25 ft, 567. Un 24% de diferencia entre 17 y 20 pies. Ese 357 es lo que daría el
+17 ft NOMINAL del papel y **no es un resultado para usar** — el contrato dice «or Refusal», así
+que la profundidad la define el rechazo en obra. Es sólo para que se vea que adivinar acá se
+paga caro. (De paso queda verificado que el motor sí toma `espaciamiento_uniforme_pulgadas`,
+que es lo que confirma que la pregunta ④ no aplica.)
 
 ## Orden de trabajo acordado (repetir en cada set nuevo)
 1. Plano de fundación con los pilotes señalados y clasificados por tipo.
