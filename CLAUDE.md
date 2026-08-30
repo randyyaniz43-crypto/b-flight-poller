@@ -98,8 +98,11 @@
   (`claude/pilotes-exsihv`, 25/08 — alta de 102 Milano Dr.) metían secciones nuevas en el mismo
   punto de inserción. Se fusionaron el #2 y el #3 DENTRO del #4 con merge commits: el párrafo de
   tramos quedó con la unión de los dos textos, y las secciones nuevas quedaron las dos.
-  **Fusionando el #4 entra todo**; el #2 y el #3 se pueden cerrar, o fusionar antes en cualquier
-  orden — comprobado fusionando de verdad, las cuatro combinaciones dan limpio.
+  **Fusionando el #4 entra todo, y lo más simple es fusionarlo y CERRAR el #2 y el #3.**
+  Comprobado fusionando de verdad, paso por paso: con el #4 primero, el #2 y el #3 después
+  entran limpios en cualquier orden; y #2→#4→#3 y #3→#4→#2 también. La ÚNICA combinación que
+  falla es fusionar el #2 y el #3 seguidos SIN el #4 en el medio: ése es el choque original
+  entre esos dos, que vive entre sus ramas y esta resolución no lo toca.
   Lección para la próxima: resolver un choque de este archivo puede MOVER el conflicto a un
   tercer PR (pasó con el #3, que iba limpio hasta que el #4 se quedó con lo del #2). Después de
   resolver, re-verificar TODOS los pares, no sólo el que se tocó.
