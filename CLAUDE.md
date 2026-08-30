@@ -92,14 +92,17 @@
   sobre `main`, no suponiéndolo. Ese chequeo es barato (`git merge` en local) y **hay que
   hacerlo antes de afirmar que no hay conflicto**: en esta sesión se afirmó dos veces sin
   comprobar y una de las dos era falsa.
-- **OJO con los PRs de memoria de b-flight-poller: chocan ENTRE ELLOS.** Hay tres abiertos y
-  los tres editan este archivo: #2 (`claude/piles-f87lis`, 21/08 — regla PERMANENTE de capas
-  House/Pool y fórmulas de rendimiento calibradas sobre 41 días reales), #3
-  (`claude/pilotes-exsihv`, 25/08 — alta de 102 Milano Dr.) y #4 (éste). Comprobado
-  fusionando de verdad: **#2 choca con #3 y con #4**; #3 y #4 entre sí van limpios. El choque
-  es UN SOLO párrafo, el de tramos, que #2 y #4 reescriben los dos. Este #4 ya trae la UNIÓN
-  de ambos textos, así que al resolver **quedate con la versión del #4 y no perdés nada**.
-  El #2 NO se puede descartar: su regla de capas y sus fórmulas no están en ningún otro lado.
+- **Los tres PRs de memoria de b-flight-poller ya están RESUELTOS dentro del #4** (30/08).
+  Los tres editaban este archivo y chocaban: #2 (`claude/piles-f87lis`, 21/08 — regla de capas
+  House/Pool y fórmulas de rendimiento) y #4 reescribían los dos el párrafo de tramos; #2 y #3
+  (`claude/pilotes-exsihv`, 25/08 — alta de 102 Milano Dr.) metían secciones nuevas en el mismo
+  punto de inserción. Se fusionaron el #2 y el #3 DENTRO del #4 con merge commits: el párrafo de
+  tramos quedó con la unión de los dos textos, y las secciones nuevas quedaron las dos.
+  **Fusionando el #4 entra todo**; el #2 y el #3 se pueden cerrar, o fusionar antes en cualquier
+  orden — comprobado fusionando de verdad, las cuatro combinaciones dan limpio.
+  Lección para la próxima: resolver un choque de este archivo puede MOVER el conflicto a un
+  tercer PR (pasó con el #3, que iba limpio hasta que el #4 se quedó con lo del #2). Después de
+  resolver, re-verificar TODOS los pares, no sólo el que se tocó.
 - Sigue abierto y NO es mío: **PR #2 de acp-foundation** (`claude/rendimiento-agente`,
   fórmulas de rendimiento del agente IA), del 21/08, sobre una base anterior al `main`
   actual — puede pedir un merge cuando Randy lo retome.
@@ -178,6 +181,21 @@ app (`ai-knowledge.js`, sección RENDIMIENTO — PR #2 de acp-foundation).
 - Guardas: días YA trabajados → mandan los datos reales del Log, no la fórmula. Esperas de
   camión: irrelevantes (1.2% del tiempo). El «Drill Time» manual de Randy queda ~6 min por
   debajo del ciclo real (no usarlo para pronosticar).
+
+## Proyecto nuevo: 102 Milano Dr., Islamorada FL 33036 (25/08/2026)
+- Contrato/Scope of Work de ACP Foundation Works LLC. Owner: Mr. David Engel,
+  102 Milano Dr, Islamorada FL 33036 · (305) 304-4501 · homeinspectorinthekeys@gmail.com.
+  Project Name: «102 Milano add. auger Piles».
+- Alcance leido del escaneo (verificado a zoom): **21 pilotes auger cast Ø16"**,
+  **17 ft «or Refusal»** de longitud, **6 varillas #6**, **aros #3 @ 10" o.c. uniformes**
+  (sin zona de confinamiento declarada), **grout 5000 psi**.
+- El escaneo llega CORTADO por abajo: faltan las notas al pie *, ** y *** que califican
+  «17 ft», «as specified at the above mentioned location» y «or Refusal». Pedirlas.
+- NO hay estudio de suelos ni planos estructurales en mano → cota de corte, nivel del
+  concreto, recubrimiento, traslape, separadores y largo de jaula quedan NO DETERMINABLES.
+- Ficha-imagen entregada: `Ficha_Pilotes_102_MILANO_DR.png` (molde de 7 campos + complemento
+  + banda de alerta). Pendiente: la ULTIMA PALABRA de Randy en las preguntas del modulo
+  Piles (L_colado / L_corte / L_fabrica) antes de cargar la obra en la app.
 
 ## Orden de trabajo acordado (repetir en cada set nuevo)
 1. Plano de fundación con los pilotes señalados y clasificados por tipo.
