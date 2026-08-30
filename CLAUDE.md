@@ -47,7 +47,7 @@
 - **Ninguno toca el build ni el despliegue.** Los del #3 al #7 salen de `main`, son
   independientes y se fusionan en cualquier orden; añaden el mismo bloque `scripts.test`
   a `package.json`, byte a byte idéntico, para que git los fusione sin conflicto.
-  El #8, #9 y #10 son una **PILA** y hay que fusionarlos EN ORDEN.
+  El #8, #9, #10 y #11 son una **PILA** y hay que fusionarlos EN ORDEN.
   Ojo: hay un **#4 en cada repo**, son cosas distintas.
 
 | Repo | PR | Base | Qué |
@@ -60,6 +60,7 @@
 | acp-foundation | #8 | main | el estimador de camiones usaba 65 bombazos/yd³ y el resto 63 |
 | acp-foundation | #9 | #8 | el factor pasa a ser configurable de verdad en /log/, /gestion/ y /piles/ |
 | acp-foundation | #10 | #9 | el agente de IA lee el factor real en vez de uno de memoria |
+| acp-foundation | #11 | #10 | cabos sueltos: modelo, glosario del reporte, rango de ccSetBpy, TTL de caché |
 | b-flight-poller | #4 | main | esta corrección de memoria |
 
 - **EL FACTOR DE CONCRETO (bombazos por yarda) YA NO ES CONSTANTE** — #8, #9 y #10. Era 63
@@ -68,6 +69,10 @@
   después `localStorage['acpBombYd']`, y 63 al final. El motor lo recibe POR PARÁMETRO
   (`runAll(state,{bombazosYd3})`) — NO le metas `localStorage`, rompe el `require()` de Node.
   Decisiones de Randy (29/08): el PDF del cliente SIGUE la calibración, y van los tres módulos.
+  **El TTL de la caché de prompt del agente se deja en 5 minutos A PROPÓSITO** (#11): la de 1 hora
+  cuesta 2× la escritura y necesita 3 consultas para amortizar contra 2 de la corta, y el patrón
+  de uso de Randy NO está medido — subirlo a ciegas puede salir más caro. El #11 agrega un rollup
+  diario de tokens; se decide mirando `cacheRead` contra `cacheWrite5m`, no de memoria.
   Consecuencia que hay que tener presente: por pilote se guarda el bombazo CRUDO y ningún PDF
   se archiva, así que recalibrar reescribe el concreto de obras ya cerradas.
 
@@ -79,11 +84,11 @@
 - **`sw-kill.js` (PR #5) es la salida de emergencia**, y hay que saber que existe: un
   service worker mal desplegado deja clavados los teléfonos ya instalados y ningún deploy
   los rescata. Se copia sobre `sw.js`, se despliega, y cada teléfono se limpia solo.
-- Con los OCHO fusionados hay **137 tests** con `npm test` (`node --test`, cero
-  dependencias, sin bundler): 44 · 4 · 17 · 20 · 14 · 4 · 21 · 13. Los de service worker y los del cliente
+- Con los NUEVE fusionados hay **143 tests** con `npm test` (`node --test`, cero
+  dependencias, sin bundler): 44 · 4 · 17 · 20 · 14 · 4 · 21 · 13 · 6. Los de service worker y los del cliente
   de errores ejecutan el archivo REAL dentro de un entorno simulado con `node:vm`, así que no
   pueden divergir de lo desplegado. **Correr `npm test` antes de tocar nada.**
-- Los ocho fusionan limpio (los tres últimos en su orden de pila) — comprobado fusionando de verdad
+- Los nueve fusionan limpio (los cuatro últimos en su orden de pila) — comprobado fusionando de verdad
   sobre `main`, no suponiéndolo. Ese chequeo es barato (`git merge` en local) y **hay que
   hacerlo antes de afirmar que no hay conflicto**: en esta sesión se afirmó dos veces sin
   comprobar y una de las dos era falsa.
