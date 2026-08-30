@@ -34,9 +34,9 @@
   (commits 3fc4fd4 + ecbf70b, 17/08): `claude-opus-5` con effort max, prompt propio que
   también lee TABLAS MANUSCRITAS del contratista (filas Qty|Pile|Acero|Aros, "6#6" = 6
   varillas #6, CB = acero central), parser con fences. ai.js también quedó en opus-5 +
-  effort max. El PR #1 (mergeado con main, sw v347) solo le SUMA: reglas de tramos en el
-  prompt (1er aro = posición, última zona = resto, nunca 1 sola zona) + normalizarTipo()
-  servidor. NO volver a reescribir analyze-plan: la base es la de Randy.
+  effort max. En main están también (mismo squash 7ca37e0): reglas de tramos en el prompt
+  (1er aro = posición, última zona = resto, nunca 1 sola zona) + normalizarTipo() servidor.
+  NO volver a reescribir analyze-plan: la base es la de Randy.
 
 ## Pull Requests abiertos (foto del 29/08/2026 — VERIFICAR ANTES DE ACTUAR)
 - **Esta lista caduca.** La nota de tramos de arriba decía «pendiente de merge» de un PR
@@ -139,11 +139,45 @@
   proyecto creado en Pile Log (id f3c67b9f-258e-4b1f-86d9-63431313f12d) COMPLETO: jaula,
   plano S-1 subido (blob pilelog-i-4dd83649-6079-4bb6-9aa5-1577c31ebc08, 3001×1473 recorte
   755,655–2365,1445 del PDF estructural a escala 3000/1610) y los 42 pilotes CONFIRMADOS
-  con coordenadas de la detección geométrica, colores de la app (#5CB8FF 1P · #FF8A33 2PC ·
-  #2EE6A1 3PC) y colorLabels. Falta solo el cliente (Randy en la app). Escritura vía POST /api/sync
+  con coordenadas de la detección geométrica, TODOS en ROJO #FF4D4D capa «House» (regla de
+  Randy, 18/08; jaula también renombrada 'House'). El plano de la app va LIMPIO, sin leyenda
+  impresa (Randy la pidió y luego la quitó: la leyenda con profundidades quedó solo como
+  imagen entregada en el chat). Falta solo el cliente (Randy en la app). Escritura vía POST /api/sync
   (doc completo: piles `{updatedAt,jobs}` SIN envoltura; log `{updatedAt,data:{projects,symbols}}`),
   header x-acp-write = contraseña de edición que Randy pasa cuando hace falta — NO guardarla
   en esta memoria. Siempre: GET → respaldo → agregar → POST completo → GET de verificación.
+
+## Regla PERMANENTE de capas en Pile Log (Randy, 18/08/2026 — «esto siempre aplica»)
+- Pilotes de CASA → capa ROJA `#FF4D4D` con nombre **House**.
+- El AZUL `#5CB8FF` queda RESERVADO para la PISCINA → nombre **Pool** (solo si hay piscina).
+- Los nombres de capas (colorLabels) van SIEMPRE en inglés (House, Pool, Carport, Deck…).
+- OJO técnico: el color de capa se escribe en `manualColor` del pilote (el campo `color` solo
+  pinta los 'detected'; un 'confirmed' sin manualColor se dibuja VERDE de estado). Poner
+  `color` Y `manualColor` iguales + colorLabels con ese hex.
+
+## Fórmulas de RENDIMIENTO (Randy, 21/08/2026 — «ponéselas al agente de Piles»)
+Calibradas con regresión sobre el Pile Log real (41 días de hinca medidos en vivo · 21 obras ·
+789 pilotes, may–ago 2026; verificadas con recálculo independiente). Usarlas SIEMPRE que Randy
+pida pronosticar tiempo de obra, días o camiones. También están en el manual del agente de la
+app (`ai-knowledge.js`, sección RENDIMIENTO — PR #2 de acp-foundation).
+- **Minutos de hinca del día ≈ 55 + 5.7×pilotes + 0.41×pies** (error ±49 min). Jornada efectiva
+  ≈ 300 min (5 h) → pilotes/día n ≈ 245 ÷ (5.7 + 0.41×L), L = pies por pilote.
+- **Días de obra** = pilotes ÷ n (arriba). Atajo: horas ≈ pilotes × 17 ÷ 60 — el Nº de pilotes
+  pronostica mejor (r² 0.94) que pies (0.91) o concreto (0.91); pies y yd³ son casi la misma
+  señal (corr 0.977; 4.08 bombazos/ft · 63 bombazos = 1 yd³ — OJO, ese 63 dejó de ser
+  constante: desde los PR #9/#11 de acp-foundation es la calibración de la bomba y sale de
+  `/acp-bpy.js`. La regresión se hizo con 63, así que si algún día se recalibra hay que
+  rehacerla, no sólo cambiar el divisor).
+- **Camiones por día** (en función de los días que dé la fórmula): yd³ del día ≈ pies del día
+  × 0.065 → camiones = yd³ ÷ 5.6, redondeado HACIA ARRIBA (5.6 = mediana real de yd³/camión en
+  sus truckMarkers; el camión del cierre del día va parcial — la capacidad nominal es 7.5).
+  Bolsillo: 1 camión por cada ~85-90 pies; típico 3-4 camiones/día.
+- **Jaulas**: min/jaula ≈ 0.96 × (aros + 2×varillas); jornada de 8 h. Pronosticar por
+  COMPLEJIDAD, nunca por toneladas (el peso infla ~2× las jaulas largas). Guilford: 43 min/jaula
+  → 42 jaulas ≈ 30 h ≈ 4 jornadas.
+- Guardas: días YA trabajados → mandan los datos reales del Log, no la fórmula. Esperas de
+  camión: irrelevantes (1.2% del tiempo). El «Drill Time» manual de Randy queda ~6 min por
+  debajo del ciclo real (no usarlo para pronosticar).
 
 ## Orden de trabajo acordado (repetir en cada set nuevo)
 1. Plano de fundación con los pilotes señalados y clasificados por tipo.
