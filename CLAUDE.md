@@ -38,96 +38,55 @@
   (1er aro = posición, última zona = resto, nunca 1 sola zona) + normalizarTipo() servidor.
   NO volver a reescribir analyze-plan: la base es la de Randy.
 
-## Pull Requests abiertos (foto del 30/08/2026 — VERIFICAR ANTES DE ACTUAR)
-- **TODOS LISTOS PARA FUSIONAR** (30/08). Los nueve de acp-foundation y el #4 de b-flight-poller
-  salieron de borrador. Verificado justo antes: las nueve ramas fusionan en orden sobre `main`,
-  **143/143 tests** sobre el estado combinado, y el JS inline de los seis módulos parsea (un
-  error ahí deja la app en blanco).
-- **A propósito, el #2 y el #3 de b-flight-poller quedaron EN BORRADOR.** No es un olvido: son
-  los de memoria que ya vienen dentro del #4, y GitHub no deja fusionar un borrador — así que
-  mientras sigan así es imposible caer en la única combinación mala (#2 y #3 seguidos sin el #4
-  en el medio). Si algún día se sacan de borrador, se pierde esa protección.
-- **El deploy lo hace Randy desde su máquina, siempre.** Fusionar NO despliega.
-- **Esta lista caduca.** La nota de tramos de arriba decía «pendiente de merge» de un PR
-  fusionado hacía doce días, y por poco se rehace trabajo ya en producción. Antes de tocar
-  nada de lo de abajo: `list_pull_requests` con state=all y mirar `merged_at`. Si aparece
-  fusionado, además confirmarlo en el código de `main` — la API dice qué pasó, el código
-  dice qué hay.
-- **Ninguno toca el build ni el despliegue.** Los del #3 al #7 salen de `main`, son
-  independientes y se fusionan en cualquier orden; añaden el mismo bloque `scripts.test`
-  a `package.json`, byte a byte idéntico, para que git los fusione sin conflicto.
-  El #8, #9, #10 y #11 son una **PILA** y hay que fusionarlos EN ORDEN.
-  Ojo: hay un **#4 en cada repo**, son cosas distintas.
-
-| Repo | PR | Base | Qué |
-|---|---|---|---|
-| acp-foundation | #3 | main | scrypt + límite de intentos + respaldo diario de Blobs + PDF.js |
-| acp-foundation | #4 | main | deduplicar 9,9 MB: una sola copia de `polish.*` e `images/` |
-| acp-foundation | #5 | main | service worker: tope de red, caché honesta, extintor |
-| acp-foundation | #6 | main | reporte de errores desde el teléfono de la cuadrilla |
-| acp-foundation | #7 | main | aviso cuando un tramo de aros queda en 0 pies + tests del motor |
-| acp-foundation | #8 | main | el estimador de camiones usaba 65 bombazos/yd³ y el resto 63 |
-| acp-foundation | #9 | #8 | el factor pasa a ser configurable de verdad en /log/, /gestion/ y /piles/ |
-| acp-foundation | #10 | #9 | el agente de IA lee el factor real en vez de uno de memoria |
-| acp-foundation | #11 | #10 | cabos sueltos: modelo, glosario del reporte, rango de ccSetBpy, TTL de caché |
-| b-flight-poller | #4 | main | esta corrección de memoria |
-
-- **EL FACTOR DE CONCRETO (bombazos por yarda) YA NO ES CONSTANTE** — #8, #9 y #10. Era 63
-  escrito a mano en once lugares de tres módulos, y el estimador de camiones decía 65. Ahora
-  sale de `/acp-bpy.js`: primero `ACPBomb.getTruck().bpy` (lo único que trae lo de la nube),
-  después `localStorage['acpBombYd']`, y 63 al final. El motor lo recibe POR PARÁMETRO
+## Estado de los PRs (30/08/2026 — FUSIONADO TODO en acp-foundation)
+- **`main` de acp-foundation quedó en `b347e28` con LOS NUEVE cambios adentro** y **143 tests**
+  en verde (`npm test`, `node --test`, cero dependencias, sin bundler): 44 · 4 · 17 · 20 · 14 ·
+  4 · 21 · 13 · 6. Canaria del motor verificada sobre ese `main`: Guilford sigue dando **31 aros
+  por pilote, 1302 en la obra y 72.90 yd³**. Si eso cambia, algo se rompió.
+- **OJO — LAS PILAS DE PRs SE ROMPEN SOLAS. No volver a apilar.** Pasó el 30/08: los #8→#9→#10→#11
+  eran una cadena (cada uno con base en el anterior). Al fusionar el #8, GitHub **borró su rama**,
+  y como esa rama era la BASE del #9, GitHub **cerró el #9 solo, sin fusionarlo**. Arrastró al #11
+  por lo mismo. Hubo que rehacerlos como **#12 y #13**. Si alguna vez hace falta una cadena: o se
+  fusiona de ARRIBA hacia abajo, o se desactiva el borrado automático de ramas, o directamente no
+  se apila y se manda todo en un PR sobre `main`.
+- **Antes de afirmar NADA sobre `main`, correr `git fetch --prune`.** El 30/08 se dio por perdido
+  trabajo que en realidad estaba fusionado, por leer un `origin/main` viejo. La señal estaba a la
+  vista y se ignoró: un `git rev-parse origin/<rama>` había fallado por refs incompletas. La regla
+  de siempre vale doble acá: la API dice qué pasó, el código dice qué hay — pero sólo si el código
+  que mirás es el de verdad.
+- **Fusionar NO despliega.** El deploy sale de la máquina de Randy, siempre. Al 30/08 todo esto
+  está en `main` y **sin desplegar**, junto con ~48 commits suyos de gestión anteriores.
+- **Randy tiene que hacer dos cosas a mano, y ahora URGE porque el PR #3 YA ESTÁ EN `main`:**
+  (1) **rotar la contraseña de Pablito** — se sacó del fuente pero sigue en el historial de git, y
+  quitarla del código NO la invalida; (2) poner **`ACP_PW_PEPPER`** en las variables de Netlify —
+  sin ella funciona igual, pero el índice de búsqueda deja de proteger contra búsqueda offline si
+  alguien se lleva el blob.
+- **`sw-kill.js` es la salida de emergencia**, y hay que saber que existe: un service worker mal
+  desplegado deja clavados los teléfonos ya instalados y ningún deploy los rescata. Se copia sobre
+  `sw.js`, se despliega, y cada teléfono se limpia solo.
+- **EL FACTOR DE CONCRETO (bombazos por yarda) YA NO ES CONSTANTE.** Era 63 escrito a mano en once
+  lugares de tres módulos, y el estimador de camiones decía 65. Ahora sale de `/acp-bpy.js`:
+  primero `ACPBomb.getTruck().bpy` (lo único que trae lo de la nube), después
+  `localStorage['acpBombYd']`, y 63 al final. El motor lo recibe POR PARÁMETRO
   (`runAll(state,{bombazosYd3})`) — NO le metas `localStorage`, rompe el `require()` de Node.
   Decisiones de Randy (29/08): el PDF del cliente SIGUE la calibración, y van los tres módulos.
-  **El TTL de la caché de prompt del agente se deja en 5 minutos A PROPÓSITO** (#11): la de 1 hora
-  cuesta 2× la escritura y necesita 3 consultas para amortizar contra 2 de la corta, y el patrón
-  de uso de Randy NO está medido — subirlo a ciegas puede salir más caro. El #11 agrega un rollup
-  diario de tokens; se decide mirando `cacheRead` contra `cacheWrite5m`, no de memoria.
-  Consecuencia que hay que tener presente: por pilote se guarda el bombazo CRUDO y ningún PDF
-  se archiva, así que recalibrar reescribe el concreto de obras ya cerradas.
-
-- **Randy tiene que hacer dos cosas a mano** (no las puede hacer una sesión):
-  (1) **rotar la contraseña de Pablito** — se sacó del fuente en el PR #3 pero sigue en el
-  historial de git, y quitarla del código NO la invalida; (2) poner **`ACP_PW_PEPPER`** en
-  las variables de Netlify — sin ella el PR #3 funciona igual, pero el índice de búsqueda
-  deja de proteger contra búsqueda offline si alguien se lleva el blob.
-- **`sw-kill.js` (PR #5) es la salida de emergencia**, y hay que saber que existe: un
-  service worker mal desplegado deja clavados los teléfonos ya instalados y ningún deploy
-  los rescata. Se copia sobre `sw.js`, se despliega, y cada teléfono se limpia solo.
-- Con los NUEVE fusionados hay **143 tests** con `npm test` (`node --test`, cero
-  dependencias, sin bundler): 44 · 4 · 17 · 20 · 14 · 4 · 21 · 13 · 6. Los de service worker y los del cliente
-  de errores ejecutan el archivo REAL dentro de un entorno simulado con `node:vm`, así que no
-  pueden divergir de lo desplegado. **Correr `npm test` antes de tocar nada.**
-- Los nueve fusionan limpio (los cuatro últimos en su orden de pila) — comprobado fusionando de verdad
-  sobre `main`, no suponiéndolo. Ese chequeo es barato (`git merge` en local) y **hay que
-  hacerlo antes de afirmar que no hay conflicto**: en esta sesión se afirmó dos veces sin
-  comprobar y una de las dos era falsa.
-- **Los tres PRs de memoria de b-flight-poller ya están RESUELTOS dentro del #4** (30/08).
-  Los tres editaban este archivo y chocaban: #2 (`claude/piles-f87lis`, 21/08 — regla de capas
-  House/Pool y fórmulas de rendimiento) y #4 reescribían los dos el párrafo de tramos; #2 y #3
-  (`claude/pilotes-exsihv`, 25/08 — alta de 102 Milano Dr.) metían secciones nuevas en el mismo
-  punto de inserción. Se fusionaron el #2 y el #3 DENTRO del #4 con merge commits: el párrafo de
-  tramos quedó con la unión de los dos textos, y las secciones nuevas quedaron las dos.
-  **Fusionando el #4 entra todo, y lo más simple es fusionarlo y CERRAR el #2 y el #3.**
-  Comprobado fusionando de verdad, paso por paso: con el #4 primero, el #2 y el #3 después
-  entran limpios en cualquier orden; y #2→#4→#3 y #3→#4→#2 también. La ÚNICA combinación que
-  falla es fusionar el #2 y el #3 seguidos SIN el #4 en el medio: ése es el choque original
-  entre esos dos, que vive entre sus ramas y esta resolución no lo toca.
-  Lección para la próxima: resolver un choque de este archivo puede MOVER el conflicto a un
-  tercer PR (pasó con el #3, que iba limpio hasta que el #4 se quedó con lo del #2). Después de
-  resolver, re-verificar TODOS los pares, no sólo el que se tocó.
-- Sigue abierto y NO es mío: **PR #2 de acp-foundation** (`claude/rendimiento-agente`,
-  fórmulas de rendimiento del agente IA), del 21/08, sobre una base anterior al `main`
-  actual — puede pedir un merge cuando Randy lo retome.
-- **El plan de cinco pasos está completo.** Y ojo con lo que decía esta misma nota antes:
-  que faltaba «extraer el cálculo de aros de `piles/index.html` a un módulo». ESO YA ESTABA
-  HECHO — el motor vive en `/acp-calc-pilotes.js` (482 líneas, JS puro, sin DOM ni idioma,
-  compartido por `/piles/` y `/gestion/`) y ya traía `module.exports`, así que se puede
-  `require()` desde Node sin navegador. Lo que faltaba de verdad eran los tests, y los
-  añade el PR #7.
-- Referencia del motor, verificada ejecutándolo: 125 Guilford Ct. da **31 aros por pilote y
-  1302 en la obra**. `L_efectiva = L_colado − punta`; la cabeza NO descuenta aros (en
-  `L_corte − punta − cabeza` el `L_corte` se cancela). Si algún día ese 31 cambia, algo se
-  rompió.
+  **El TTL de la caché de prompt del agente se deja en 5 minutos A PROPÓSITO**: la de 1 hora cuesta
+  2× la escritura y necesita 3 consultas para amortizar contra 2 de la corta, y el patrón de uso de
+  Randy NO está medido. Hay un rollup diario de tokens en `ai.js`; se decide mirando `cacheRead`
+  contra `cacheWrite5m`, no de memoria.
+  Consecuencia que hay que tener presente: por pilote se guarda el bombazo CRUDO y ningún PDF se
+  archiva, así que recalibrar reescribe el concreto de obras ya cerradas.
+- Sigue abierto y NO es mío: **PR #2 de acp-foundation** (`claude/rendimiento-agente`, fórmulas de
+  rendimiento del agente IA), del 21/08, sobre una base anterior — puede pedir un merge.
+- **Los tres PRs de memoria de b-flight-poller están RESUELTOS dentro del #4.** Los tres editaban
+  este archivo y chocaban: #2 (`claude/piles-f87lis`, 21/08) y #4 reescribían los dos el párrafo de
+  tramos; #2 y #3 (`claude/pilotes-exsihv`, 25/08) metían secciones nuevas en el mismo punto de
+  inserción. Se fusionaron el #2 y el #3 DENTRO del #4 con merge commits. **Fusionando el #4 entra
+  todo, y lo simple es fusionarlo y CERRAR el #2 y el #3.** El #2 y el #3 se dejaron EN BORRADOR a
+  propósito: GitHub no deja fusionar un borrador, así que mientras sigan así es imposible caer en
+  la única combinación mala (#2 y #3 seguidos sin el #4 en el medio).
+  Lección: resolver un choque de este archivo puede MOVER el conflicto a un tercer PR (pasó con el
+  #3). Después de resolver, re-verificar TODOS los pares, no sólo el que se tocó.
 
 ## Proyecto activo: 125 Guilford Ct., Tavernier FL 33070
 - Geotecnia: CVIII Engineering Group (Daniel Morao PE 87771), orden 26-0507-G, 07/05/2026.
