@@ -38,7 +38,16 @@
   (1er aro = posición, última zona = resto, nunca 1 sola zona) + normalizarTipo() servidor.
   NO volver a reescribir analyze-plan: la base es la de Randy.
 
-## Pull Requests abiertos (foto del 29/08/2026 — VERIFICAR ANTES DE ACTUAR)
+## Pull Requests abiertos (foto del 30/08/2026 — VERIFICAR ANTES DE ACTUAR)
+- **TODOS LISTOS PARA FUSIONAR** (30/08). Los nueve de acp-foundation y el #4 de b-flight-poller
+  salieron de borrador. Verificado justo antes: las nueve ramas fusionan en orden sobre `main`,
+  **143/143 tests** sobre el estado combinado, y el JS inline de los seis módulos parsea (un
+  error ahí deja la app en blanco).
+- **A propósito, el #2 y el #3 de b-flight-poller quedaron EN BORRADOR.** No es un olvido: son
+  los de memoria que ya vienen dentro del #4, y GitHub no deja fusionar un borrador — así que
+  mientras sigan así es imposible caer en la única combinación mala (#2 y #3 seguidos sin el #4
+  en el medio). Si algún día se sacan de borrador, se pierde esa protección.
+- **El deploy lo hace Randy desde su máquina, siempre.** Fusionar NO despliega.
 - **Esta lista caduca.** La nota de tramos de arriba decía «pendiente de merge» de un PR
   fusionado hacía doce días, y por poco se rehace trabajo ya en producción. Antes de tocar
   nada de lo de abajo: `list_pull_requests` con state=all y mirar `merged_at`. Si aparece
