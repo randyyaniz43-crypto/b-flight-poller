@@ -88,6 +88,49 @@
   Lección: resolver un choque de este archivo puede MOVER el conflicto a un tercer PR (pasó con el
   #3). Después de resolver, re-verificar TODOS los pares, no sólo el que se tocó.
 
+## Sesión del 08/09/2026 — TRES PRs abiertos en acp-foundation (main iba por BUILD 344)
+- **PR #14 · los ejes van DEBAJO de los pilotes.** El eje que Randy pone a mano se dibujaba
+  encima y le tapaba el círculo y el número, en pantalla Y en el PDF. Pantalla: la capa de ejes
+  se partió en dos — las líneas ya puestas en `axis-svg-back` (debajo de `pile-svg`) y la regla
+  con las × de borrar arriba, porque son controles y tienen que quedar tocables. PDF: el bloque
+  de ejes se movió ANTES del bucle de pilotes. Un solo archivo (`log/index.html`).
+- **PR #15 · la conversación de la IA sobrevive al cambio de módulo.** Vivía sólo en memoria
+  (`var msgs = []` en el widget y en `/ai/`) y cada salto entre módulos es una navegación
+  completa: el chat volvía vacío. Ahora hay UNA conversación compartida, guardada en
+  `acp-ai-acciones.js` (un solo dueño, al lado del handoff): fotos afuera SIEMPRE (una revienta
+  los ~5 MB y el setItem falla EN SILENCIO), degradación por cuota, leerla no la consume,
+  vence a las 12 h, y «Cerrar conversación» la borra. 11 tests nuevos + guard de acoplamiento.
+- **PR #15 (mismo) · las 5 preguntas del módulo, DE MARCAR.** La app no tenía NINGÚN mecanismo
+  de botones de respuesta: se creó el tipo de acción `pregunta` en `acp-ai-acciones.js` (liviano,
+  lo dibuja también el widget) — un botón por opción con su línea chica, más el «Otro (manual)»
+  que **pone la app sola** (el manual tiene prohibido mandarlo en las opciones) y deja el foco en
+  el teclado. Contestar entra por el MISMO camino que el teclado (`ctx.enviar`, nuevo en los dos
+  ctx). Las 5 preguntas quedaron en el manual con el texto EXACTO del `Flow.build`.
+  Bug que encontró el test y no la lectura: los botones se apagaban redibujando la tarjeta, pero
+  dos toques entran en el mismo tick y salían DOS respuestas → la guarda va en el handler.
+  **Se metió en el PR #15 a propósito** (no en uno nuevo): toca los mismos 3 archivos y apilar
+  PRs ya se rompió una vez. 13 tests, uno lee las preguntas del `piles/index.html` REAL y las
+  compara contra el manual.
+- **PR #16 · el cerebro del skill `/Pilotes` adentro del agente.** Archivo NUEVO
+  `netlify/functions/ai-knowledge-pilotes.js` (~10 KB), inyectado por `ai.js` como SEGUNDO bloque
+  estable ANTES de los DATOS y con UN solo punto de caché al final (la caché es calce de PREFIJO:
+  1 breakpoint en vez de 2). Lleva los tres métodos con sus ecuaciones (Meyerhof con `z_req`
+  cerrado, FHWA GEC-8 y Zelada capa a capa), FS 2.5/3.0 con su condición, por qué los β subestiman
+  en caliza, el encuadre FBC §1810.3.3.1, leer el detalle POR FOTO (la cadena de cotas manda sobre
+  la nota de la sección), la cadena del nivel del concreto (se RESTA, nunca se suma), el molde de
+  7 campos y el briefing del PM. **Lo que NO se puede portar (Excel, Python, rasterizar PDF) está
+  DECLARADO**, no fingido. 14 tests: FS que no se aflojan, los topes de punta que no se mezclan
+  (30 tsf Meyerhof vs 45 de A y B) y el acoplamiento — cada campo que el manual manda leer tiene
+  que EXISTIR en el snapshot de `ai.js`.
+  **Los 3 guards del manual ahora leen LOS DOS archivos** (antes sólo `ai-knowledge.js`, y el
+  texto nuevo habría quedado sin vigilancia). El guard de caché se actualizó a la forma de dos
+  bloques SIN aflojarlo: además comprueba que los manuales van antes de los DATOS.
+- Al 08/09 quedan **#14, #15 y #16 abiertos en borrador**, todos sobre `main` y sin choque entre
+  ellos (#14 toca `log/index.html`; #15 `ai-knowledge.js` + los 3 del chat; #16 `ai.js` + archivo
+  nuevo + los tests de guards). Suite: **228 en verde** en el #15, **218** en el #16.
+- Randy pidió **no seguir ningún PR** (nada de check-ins automáticos): se cancelaron las
+  suscripciones. Los PRs quedan para que él los fusione cuando quiera.
+
 ## Proyecto activo: 125 Guilford Ct., Tavernier FL 33070
 - Geotecnia: CVIII Engineering Group (Daniel Morao PE 87771), orden 26-0507-G, 07/05/2026.
   Estructura: LINCHENATENG / David G. Osborn AIA, job 2024071, set FOR SUBMITTAL 09/07/2026.
@@ -129,29 +172,45 @@
   pinta los 'detected'; un 'confirmed' sin manualColor se dibuja VERDE de estado). Poner
   `color` Y `manualColor` iguales + colorLabels con ese hex.
 
-## Fórmulas de RENDIMIENTO (Randy, 21/08/2026 — «ponéselas al agente de Piles»)
-Calibradas con regresión sobre el Pile Log real (41 días de hinca medidos en vivo · 21 obras ·
-789 pilotes, may–ago 2026; verificadas con recálculo independiente). Usarlas SIEMPRE que Randy
-pida pronosticar tiempo de obra, días o camiones. También están en el manual del agente de la
-app (`ai-knowledge.js`, sección RENDIMIENTO — PR #2 de acp-foundation).
-- **Minutos de hinca del día ≈ 55 + 5.7×pilotes + 0.41×pies** (error ±49 min). Jornada efectiva
-  ≈ 300 min (5 h) → pilotes/día n ≈ 245 ÷ (5.7 + 0.41×L), L = pies por pilote.
-- **Días de obra** = pilotes ÷ n (arriba). Atajo: horas ≈ pilotes × 17 ÷ 60 — el Nº de pilotes
-  pronostica mejor (r² 0.94) que pies (0.91) o concreto (0.91); pies y yd³ son casi la misma
-  señal (corr 0.977; 4.08 bombazos/ft · 63 bombazos = 1 yd³ — OJO, ese 63 dejó de ser
-  constante: desde los PR #9/#11 de acp-foundation es la calibración de la bomba y sale de
-  `/acp-bpy.js`. La regresión se hizo con 63, así que si algún día se recalibra hay que
-  rehacerla, no sólo cambiar el divisor).
-- **Camiones por día** (en función de los días que dé la fórmula): yd³ del día ≈ pies del día
-  × 0.065 → camiones = yd³ ÷ 5.6, redondeado HACIA ARRIBA (5.6 = mediana real de yd³/camión en
-  sus truckMarkers; el camión del cierre del día va parcial — la capacidad nominal es 7.5).
-  Bolsillo: 1 camión por cada ~85-90 pies; típico 3-4 camiones/día.
-- **Jaulas**: min/jaula ≈ 0.96 × (aros + 2×varillas); jornada de 8 h. Pronosticar por
-  COMPLEJIDAD, nunca por toneladas (el peso infla ~2× las jaulas largas). Guilford: 43 min/jaula
-  → 42 jaulas ≈ 30 h ≈ 4 jornadas.
-- Guardas: días YA trabajados → mandan los datos reales del Log, no la fórmula. Esperas de
-  camión: irrelevantes (1.2% del tiempo). El «Drill Time» manual de Randy queda ~6 min por
-  debajo del ciclo real (no usarlo para pronosticar).
+## Fórmulas de RENDIMIENTO — MANDA LA APP, no esta memoria (revisado 08/09/2026)
+Salieron de una regresión sobre el Pile Log real (41 días de hinca medidos en vivo · 21 obras ·
+789 pilotes, may–ago 2026), se le pasaron al agente de la app el 21/08 y **Randy después las
+recalibró con más datos**. Desde entonces la fuente de verdad es la sección
+«# PRONOSTICAR UNA OBRA» de `netlify/functions/ai-knowledge.js` en `main`. **Antes de pronosticar
+nada, leer esa sección**: si esta memoria y el manual difieren, gana el manual, y lo que hay que
+hacer es corregir ACÁ, nunca agregar una segunda fórmula allá.
+Lo que Randy cambió (y por qué importa no volver a las cifras viejas):
+- Jornada **6 h / 305 min** para pilotes (acá decía 300 min / 5 h) → pilotes por día
+  `n = 305 ÷ (5.7 + 0.41 × pica)`. Prohibido el «20 por día» fijo: depende de la profundidad.
+- Concreto del día: **pies × 0.0643** (acá decía 0.065), de 4.052 bombazos por pie medidos sobre
+  840 pilotes. Los bombazos por yarda NO son constantes: salen de `bombazosPorYd3` de los DATOS
+  (calibración de la bomba, `/acp-bpy.js`), y 63 sólo si no viene.
+- Camiones: `yd³ del día ÷ yd3Camion` (**7.5**, el configurado en la app), redondeado HACIA
+  ARRIBA y cada día por separado. **NO usar el 5.6 que decía esta memoria**: eso era la carga
+  MEDIA observada (7.07 hoy), y meter una media como capacidad ya dio de más una vez. Randy
+  eligió 7.5 A PROPÓSITO: 8.5 acierta más días pero se queda corto 9 veces contra 4, y quedarse
+  sin concreto es la cuadrilla parada. Bolsillo: 1 camión cada ~115 pies.
+- Sigue valiendo lo demás: minutos del día ≈ 55 + 5.7×pilotes + 0.41×pies (±49 min); el Nº de
+  pilotes pronostica mejor (r² 0.94) que pies o concreto (0.91); días YA trabajados mandan los
+  datos reales del Log (`completadosPorDia`, `camionesPorDia`), no la fórmula; el «Drill Time»
+  manual queda ~6 min por debajo del ciclo real; las esperas de camión son 1.2% del tiempo.
+- **Jaulas**: el manual tiene su propia regla en GESTIÓN (`horas = aros ÷ 385 × 6 × (6 ÷ personas)`,
+  medida en 907 Caroline St). La de esta memoria —min/jaula ≈ 0.96 × (aros + 2×varillas)— salió
+  de 7 días de dayWork y es más gruesa: usarla sólo si la de GESTIÓN no aplica, y decir cuál se usó.
+  Lo que no cambia: pronosticar por COMPLEJIDAD (aros + varillas), NUNCA por toneladas — el peso
+  infla ~2× las jaulas largas.
+
+## El manual del agente tiene TESTS que lo vigilan (08/09/2026)
+`npm test` en acp-foundation corre guards sobre `ai-knowledge.js`, y hay que conocerlos antes de
+editarlo: (1) **no puede nombrar ninguna versión de modelo** (decía «Opus 4.8» mientras el código
+llamaba a otro: si le preguntabas, mentía); (2) **no puede afirmar un factor fijo de bombazos por
+yd³** ni los bombazos por camión — tiene que mandar al campo `bombazosPorYd3` de los DATOS;
+(3) el glosario del reporte no puede atar el concreto a los 7.5 yd³ del camión. Si se agrega un
+manual nuevo en otro archivo, **extender esos guards para que también lo lean**, o el texto nuevo
+queda fuera de la vigilancia. Ojo con la sintaxis: es un template literal, hay que escapar los
+backticks de los ejemplos y evitar la secuencia dólar-llave.
+Para correr la suite hace falta `npm install` primero (sin `node_modules` fallan 12 tests que en
+realidad están bien). Al 08/09: **215 en verde**.
 
 ## Proyecto nuevo: 102 Milano Dr., Islamorada FL 33036 (25/08/2026)
 - Contrato/Scope of Work de ACP Foundation Works LLC. Owner: Mr. David Engel,
