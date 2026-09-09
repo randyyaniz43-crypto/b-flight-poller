@@ -88,7 +88,7 @@
   Lección: resolver un choque de este archivo puede MOVER el conflicto a un tercer PR (pasó con el
   #3). Después de resolver, re-verificar TODOS los pares, no sólo el que se tocó.
 
-## Sesión del 08/09/2026 — TRES PRs abiertos en acp-foundation (main iba por BUILD 344)
+## Sesión del 08-09/09/2026 — CUATRO PRs, TODOS FUSIONADOS (main: BUILD 344 → 345)
 - **PR #14 · los ejes van DEBAJO de los pilotes.** El eje que Randy pone a mano se dibujaba
   encima y le tapaba el círculo y el número, en pantalla Y en el PDF. Pantalla: la capa de ejes
   se partió en dos — las líneas ya puestas en `axis-svg-back` (debajo de `pile-svg`) y la regla
@@ -125,9 +125,28 @@
   **Los 3 guards del manual ahora leen LOS DOS archivos** (antes sólo `ai-knowledge.js`, y el
   texto nuevo habría quedado sin vigilancia). El guard de caché se actualizó a la forma de dos
   bloques SIN aflojarlo: además comprueba que los manuales van antes de los DATOS.
-- Al 08/09 quedan **#14, #15 y #16 abiertos en borrador**, todos sobre `main` y sin choque entre
-  ellos (#14 toca `log/index.html`; #15 `ai-knowledge.js` + los 3 del chat; #16 `ai.js` + archivo
-  nuevo + los tests de guards). Suite: **228 en verde** en el #15, **218** en el #16.
+- **FUSIONADO TODO el 09/09** a pedido de Randy («haz deploy»): #14, #15, #16 y además el #17.
+  `main` quedó en **`8f6c08a`** con **BUILD 345 · log/version.txt 345 · CACHE_NAME v434** y la
+  suite **247 en verde — entera, por primera vez**. Fusionar NO despliega: el comando es
+  `netlify deploy --prod --dir=.` desde `C:\dev\acp-foundation`, la máquina de Randy (acá no hay
+  CLI ni token, y no los pidas: es su regla).
+- **PR #17 · el empaquetado del deploy y un test que mentía.**
+  (a) Subir el `CACHE_NAME` NO es opcional cuando se tocan los `.js` compartidos: son
+  CACHÉ-PRIMERO en el service worker, así que sin eso los teléfonos servirían el
+  `acp-ai-acciones.js` viejo mientras el HTML (red primero) ya es el nuevo — las funciones
+  nuevas no aparecen hasta la SEGUNDA apertura. Hay un guard nuevo (`test/version-deploy.test.js`)
+  que ata los tres números: los 7 `window.BUILD` iguales entre sí, `log/version.txt` igual a ese
+  número, `CACHE_NAME` sin retroceder, y que el auto-actualizador siga borrando cachés antes de
+  recargar. Verificado que el guard FALLA con un bump a medias.
+  (b) **El test de gestión fallaba SEGÚN EL DÍA de la semana y no era el motor.** El ayudante de
+  fechas del propio test saltaba SÓLO el domingo mientras la app considera hábil lunes a viernes
+  (`habilAuto: w>=1 && w<=5`): un miércoles `habil(3)` caía SÁBADO, el fixture nacía con la tanda
+  ahí y la invariante «el fin de semana lo pone Randy, no el motor» la encontraba y culpaba al
+  motor —que hacía lo correcto: respetar un finde que ya venía en el documento—. Segunda trampa
+  detrás: empujando el finde, `habil(3)` y `habil(5)` caían los DOS en el mismo lunes y el día
+  partido se mezclaba con el día gordo. Ahora cuenta DÍAS HÁBILES, verificado para los 7 días.
+  **Lección: antes de acusar al código de producción, mirá si el fixture del test es el que
+  está mintiendo — y un test que depende del calendario no dice nada el día que se pone rojo.**
 - Randy pidió **no seguir ningún PR** (nada de check-ins automáticos): se cancelaron las
   suscripciones. Los PRs quedan para que él los fusione cuando quiera.
 
